@@ -1,11 +1,10 @@
 # What's left for you
 
-## 1. Confirm the photographs are yours
-The 18 plates came from `reddit.com/r/SoloTravel_India/comments/1lsvcyl`
-(u/insane_dark_07). I assumed that account is you. If it isn't, stop — we're
-republishing someone else's photographs.
+## 0. Provenance
+_(Confirmed: `r/SoloTravel_India` post `1lsvcyl`,
+u/insane_dark_07, is Divija's own account.)_
 
-## 2. Convert the 18 photos to ink-and-watercolour
+## 1. Convert the 18 photos to ink-and-watercolour
 Nothing on this Mac can do this (no ImageMagick, Pillow, torch, or image API
 key), and no filter chain reproduces Meng To's plates anyway — they're clean
 ink linework over watercolour wash.

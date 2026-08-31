@@ -1,0 +1,90 @@
+<!doctype html><html><head><meta charset="utf-8"><title>compose</title>
+<style>
+@font-face{font-family:'Instrument Serif';font-weight:400;font-display:block;src:url(../assets/instrument-serif.woff2) format('woff2')}
+@font-face{font-family:'Instrument Serif';font-style:italic;font-weight:400;font-display:block;src:url(../assets/instrument-serif-italic.woff2) format('woff2')}
+@font-face{font-family:'Newsreader';font-weight:200 600;font-display:block;src:url(../assets/newsreader.woff2) format('woff2')}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:#fff;overflow:hidden}
+/* outer box fits the 834px-tall viewport; the design inside is 1760x1100 */
+.shot{width:1334px;height:834px;overflow:hidden;position:relative}
+.canvas{width:1760px;height:1100px;transform:scale(0.758);transform-origin:top left;
+  position:absolute;top:0;left:0;display:flex;background:#f2eee4}
+
+.pg{position:relative;width:50%;height:100%;overflow:hidden}
+/* paper tooth: fine directional grain, no imagery */
+.pg::after{content:'';position:absolute;inset:0;pointer-events:none;opacity:.55;
+  background:
+    repeating-linear-gradient(92deg,rgba(150,132,102,.055) 0 1px,transparent 1px 3px),
+    repeating-linear-gradient(4deg,rgba(150,132,102,.045) 0 1px,transparent 1px 4px),
+    radial-gradient(120% 90% at 50% 40%,transparent 55%,rgba(122,104,76,.13) 100%)}
+.pg.l{background:linear-gradient(to left,rgba(104,86,58,.34) 0,rgba(104,86,58,.13) 30px,rgba(104,86,58,.04) 74px,transparent 132px),#f2eee4}
+.pg.r{background:linear-gradient(to right,rgba(104,86,58,.34) 0,rgba(104,86,58,.13) 30px,rgba(104,86,58,.04) 74px,transparent 132px),#f2eee4}
+/* outer page-edge stack */
+.pg.l::before,.pg.r::before{content:'';position:absolute;top:0;bottom:0;width:9px;z-index:3;
+  background:repeating-linear-gradient(to right,rgba(146,127,96,.30) 0 1px,transparent 1px 3px)}
+.pg.l::before{left:0}
+.pg.r::before{right:0}
+
+/* -------- left page: the photograph, pasted in -------- */
+.photo-wrap{position:absolute;inset:86px 96px 96px 104px;display:flex;align-items:center;justify-content:center}
+.photo{max-width:100%;max-height:100%;background:#fdfcf8;padding:16px 16px 52px;
+  transform:rotate(-.5deg);box-shadow:0 12px 24px rgba(78,64,46,.24),0 3px 6px rgba(78,64,46,.16)}
+.photo img{display:block;max-width:100%;max-height:100%;object-fit:contain}
+.stamp{position:absolute;left:0;right:0;bottom:104px;text-align:center;transform:rotate(-.5deg);
+  font:400 17px/1 'Newsreader',Georgia,serif;letter-spacing:.22em;text-transform:uppercase;color:#9a8a70}
+
+/* -------- right page: the notes -------- */
+.notes{position:absolute;inset:112px 104px 100px 108px;display:flex;flex-direction:column;color:#2b2721}
+.pl{font:400 17px/1 'Newsreader',Georgia,serif;letter-spacing:.30em;text-transform:uppercase;color:#9a8a70}
+.ttl{font:400 68px/1.05 'Instrument Serif','New York',Georgia,serif;letter-spacing:.006em;margin-top:26px}
+.place{font:400 19px/1 'Newsreader',Georgia,serif;letter-spacing:.26em;text-transform:uppercase;color:#8d7c63;margin-top:24px}
+.hr{height:1px;background:linear-gradient(to right,rgba(90,76,56,.45),rgba(90,76,56,.08));margin:44px 0 40px;width:80%}
+.note{font:400 32px/1.66 'Newsreader',Georgia,serif;color:#3b352c;max-width:21ch}
+.meta{margin-top:auto;display:flex;gap:34px;align-items:baseline;
+  font:400 18px/1 'Newsreader',Georgia,serif;letter-spacing:.20em;text-transform:uppercase;color:#8d7c63}
+.meta .n{font-family:'Instrument Serif',serif;font-size:34px;letter-spacing:.04em;color:#5d5142}
+</style></head><body>
+<template id="tpl"><div class="shot"><div class="canvas">
+  <div class="pg l">
+    <div class="photo-wrap"><div class="photo"><img class="ph-img" alt=""></div></div>
+    <div class="stamp"></div>
+  </div>
+  <div class="pg r">
+    <div class="notes">
+      <p class="pl"></p><h2 class="ttl"></h2><p class="place"></p>
+      <div class="hr"></div><p class="note"></p>
+      <div class="meta"><span class="n day"></span><span class="alt"></span></div>
+    </div>
+  </div>
+</div></div></template>
+<div id="stack"></div>
+<script>window.PLATES=[{"file": "01.jpg", "title": "The Valley Opens", "place": "Rupin Valley", "day": "Day 1", "alt": "5,100 ft", "note": "The river found its line through the valley long before anyone thought to walk beside it.", "i": 0}, {"file": "02.jpg", "title": "The Gorge", "place": "Lower Waterfall", "day": "Day 2", "alt": "6,300 ft", "note": "Snowmelt going somewhere in a hurry, through rock that has not moved in a very long time.", "i": 1}, {"file": "03.jpg", "title": "Standing in the Cloud", "place": "Above Jhaka", "day": "Day 3", "alt": "8,700 ft", "note": "The cloud came up the valley to meet us rather than the other way around.", "i": 2}, {"file": "04.jpg", "title": "The Upper Waterfall", "place": "Dhanderas Thach", "day": "Day 4", "alt": "11,600 ft", "note": "You hear it for an hour before the meadow opens and you finally see the whole drop.", "i": 3}, {"file": "05.jpg", "title": "Two Walkers, One Cloud", "place": "Dhanderas Thach", "day": "Day 4", "alt": "11,600 ft", "note": "Useful reminder of scale: the two specks on the green are people, walking.", "i": 4}, {"file": "06.jpg", "title": "Snowmelt over Slab", "place": "Rupin River", "day": "Day 4", "alt": "11,400 ft", "note": "Water this colour is only ever a few hours old.", "i": 5}, {"file": "07.jpg", "title": "Looking Up", "place": "The Pine Forest", "day": "Day 3", "alt": "8,200 ft", "note": "Straight up through the pines. The only frame on the trek that is wider than it is tall.", "i": 6}, {"file": "08.jpg", "title": "Cloud in the Gorge", "place": "Below Jhaka", "day": "Day 3", "alt": "8,000 ft", "note": "The weather sat down in the valley for the afternoon and did not move.", "i": 7}, {"file": "09.jpg", "title": "Jhaka", "place": "The Hanging Village", "day": "Day 3", "alt": "8,700 ft", "note": "Slate roofs, rain, and the last village before there are no more villages.", "i": 8}, {"file": "10.jpg", "title": "Quartz, Found", "place": "Moraine", "day": "Day 5", "alt": "13,100 ft", "note": "Picked up, turned over, photographed, put back exactly where it was.", "i": 9}, {"file": "11.jpg", "title": "Above the Cloud Line", "place": "Upper Waterfall Camp", "day": "Day 5", "alt": "13,100 ft", "note": "The point on the trek where the weather is happening underneath you.", "i": 10}, {"file": "12.jpg", "title": "First Light", "place": "Ronti Gad", "day": "Day 6", "alt": "13,100 ft", "note": "Twenty minutes of pink, and then it was an ordinary grey morning again.", "i": 11}, {"file": "13.jpg", "title": "Blue Hour Meadow", "place": "Dhanderas Thach", "day": "Day 4", "alt": "11,600 ft", "note": "A clear window between two days of rain.", "i": 12}, {"file": "14.jpg", "title": "The Long Look", "place": "Dhanderas Thach", "day": "Day 4", "alt": "11,600 ft", "note": "Sitting down and looking at it properly is most of what the walk is for.", "i": 13}, {"file": "15.jpg", "title": "Facing the Cirque", "place": "Upper Waterfall", "day": "Day 5", "alt": "12,800 ft", "note": "Tomorrow's route goes up the left of that snow, which does not look possible from here.", "i": 14}, {"file": "16.jpg", "title": "The Snow Face", "place": "Rupin Head", "day": "Day 6", "alt": "14,400 ft", "note": "Old snow, new cloud, and a very cold wind coming over the top.", "i": 15}, {"file": "17.jpg", "title": "Red Pack, White Cloud", "place": "The Ascent", "day": "Day 6", "alt": "14,800 ft", "note": "First high-altitude trek, booked two days in advance, walked in Nike Blazers.", "i": 16}, {"file": "18.jpg", "title": "The Shrine at the Pass", "place": "Rupin Pass", "day": "Day 6", "alt": "15,279 ft", "note": "Tridents, prayer flags, fog. The highest point, and you cannot see any of it.", "i": 17}];window.TREK={"name": "Rupin Pass", "region": "Himachal Pradesh", "start": "24 June 2025", "days": 7, "high": "15,279 ft", "distance": "43 km"};</script>
+
+<script>
+window.renderMany = async (items, trek) => {
+  const stack = document.getElementById('stack');
+  stack.textContent = '';
+  const tpl = document.getElementById('tpl');
+  for (const it of items) {
+    const node = tpl.content.cloneNode(true);
+    const q = (c) => node.querySelector('.' + c);
+    q('ph-img').src = '../assets/plates/' + it.file;
+    q('pl').textContent    = 'Plate ' + String(it.i + 1).padStart(2, '0');
+    q('ttl').textContent   = it.title;
+    q('place').textContent = it.place;
+    q('note').textContent  = it.note;
+    q('day').textContent   = it.day;
+    q('alt').textContent   = it.alt;
+    q('stamp').textContent = trek.name + ' \u00b7 ' + trek.region;
+    stack.appendChild(node);
+  }
+  await document.fonts.ready;
+  const imgs = [...stack.querySelectorAll('img')];
+  await Promise.all(imgs.map(im => im.complete ? null
+    : new Promise(r => { im.onload = r; im.onerror = r; })));
+  await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+  return { shots: stack.querySelectorAll('.shot').length,
+           broken: imgs.filter(i => !i.naturalWidth).length,
+           h: stack.getBoundingClientRect().height };
+};
+</script></body></html>

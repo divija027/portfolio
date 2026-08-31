@@ -9,7 +9,8 @@ Adapted from Meng To's MIT-licensed **Sketchbook** landing page
 ```
 index.html          the entire site: markup + inline <style> + inline <script>
 plates.json         single source of truth for the 18 sketchbook plates
-build.py            syncs plates.json -> the PAGES array in index.html
+build.py            regenerates everything derived from plates.json
+tools/compose.html  the spread compositor (renders paper + photo + notes)
 divija-mv.pdf       resume, served at /divija-mv.pdf
 assets/             fonts, paper/botanical art, og image
 assets/plates/      SOURCE photographs (compositor input; not served to visitors)
@@ -44,16 +45,24 @@ book is too small to read) that index is the primary way to read them.
 
 **After editing text only** (titles, places, notes in `plates.json`):
 
-1. `python3 build.py` — updates the plate list in `index.html`
+1. `python3 build.py` — propagates plates.json into `index.html` **and**
+   `tools/compose.html`
 2. Re-compose the spreads (below), because the notes are baked into the images
 
 **Re-composing the spreads** needs a browser, since the compositor is a web page:
 
-1. Serve the directory (`python3 -m http.server 4173`)
-2. Open `.work/compose.html`, which stacks six spreads at a time
-3. Screenshot full-page, then crop each 2668x1668 tile and scale to 1760x1100:
+1. `python3 -m http.server 4173`
+2. Open <http://localhost:4173/tools/compose.html> in a 1760-wide window and run
+   `renderMany(PLATES.slice(0,6), TREK)` in the console — it stacks six spreads
+   at a time (three passes covers all 18)
+3. Take a **full-page** screenshot of each pass, then cut the six tiles out of it.
+   Each tile is 2668x1668 device px; scale to the 1760x1100 the site expects:
    ```bash
-   ffmpeg -i sheet.png -vf "crop=2668:1668:0:$((k*1668)),scale=1760:1100" -q:v 4 assets/spreads/NN.jpg
+   for k in 0 1 2 3 4 5; do
+     n=$(printf "%02d" $((BASE + k + 1)))
+     ffmpeg -y -i sheet.png -vf "crop=2668:1668:0:$((k*1668)),scale=1760:1100" \
+       -frames:v 1 -q:v 4 "assets/spreads/$n.jpg"
+   done
    ```
 
 **Replacing a photograph**: drop the new file over `assets/plates/NN.jpg`
