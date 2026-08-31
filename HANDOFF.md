@@ -32,26 +32,34 @@ temporary.
 from the Reddit post and your comments — the day-to-photo mapping is guesswork.
 Fix it, then `python3 build.py` and re-compose.
 
-## 4. Push and deploy
-Nothing is on GitHub yet; I committed locally only, because publishing is yours
-to trigger — especially given the Fuleex security findings are on the page
-verbatim, as you decided.
+## 4. Deploy  — DONE
+Live at <https://dmv.pages.dev> (Cloudflare Pages project `dmv`, connected to
+`divija027/portfolio`, no build command, output `/`). Pushes to `main` redeploy.
+Lighthouse 100 across accessibility, best practices, SEO and agentic browsing.
+
+An earlier Worker at `portfolio.gowdadivija.workers.dev` is redundant and can be
+deleted — Workers Custom Domains require the zone to be in your own Cloudflare
+account, so a Worker can never serve `dmv.is-a.dev`.
+
+## 5. Domain  — PR OPEN, one step left
+is-a.dev PR: <https://github.com/is-a-dev/register/pull/50154> (all CI green).
+
+**Still to do — attach the custom domain.** The Pages dashboard refuses
+`dmv.is-a.dev` because is-a.dev is on the Public Suffix List, so use the API
+with a token that has **Pages Write**:
 
 ```bash
-cd ~/adigaproj/dmv-portfolio
-gh repo create divija027/portfolio --public --source=. --remote=origin --push
+export CF_ACCOUNT_ID=0880c9b1488acd73ee21d22224693618 CF_TOKEN=your_pages_write_token
+curl -sS "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT_ID/pages/projects/dmv/domains" \
+  -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
+  -d '{"name":"dmv.is-a.dev"}'
 ```
 
-Then: Cloudflare Pages → connect the repo → **no build command, output `/`**.
+`pending` is the expected result until the PR merges. Then verify:
 
-## 5. Claim the domain
-Put your `*.pages.dev` subdomain into `deploy/dmv.json`, then fork
-`is-a-dev/register`, add it as `domains/dmv.json`, and open the PR **yourself**.
-Their README closes AI-generated PRs and blocks the author.
-
-`is-a.dev` is on the Public Suffix List, so the Pages dashboard cannot add the
-custom domain — use the Cloudflare API or the helper linked from
-<https://docs.is-a.dev/guides/cloudflare-pages/>.
+```bash
+dig +short dmv.is-a.dev CNAME && curl -sSI https://dmv.is-a.dev | head -1
+```
 
 ## 6. Later
 Swap the Reddit copies for the phone originals (AirDrop from the iPhone 13 Pro
