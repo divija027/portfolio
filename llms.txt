@@ -1,0 +1,14 @@
+# Divija MV
+
+Backend-leaning TypeScript engineer in Bengaluru. Co-Founder and CTO at BrainReef,
+founding engineer at Fuleex. Works on correctness under concurrency: append-only
+billing ledgers made exactly-once by unique constraint, payment webhooks that
+survive the buyer closing the tab, and multi-tenant row isolation.
+
+## Links
+
+- [Home](https://dmv.is-a.dev/): portfolio, work history and a sketchbook of the Rupin Pass trek
+- [Résumé (PDF)](https://dmv.is-a.dev/divija-mv.pdf): full work history and stack
+- [GitHub](https://github.com/divija027): source, including this site
+- [LinkedIn](https://www.linkedin.com/in/divijamv): contact and work history
+- [BrainReef](https://brainreef.in): student resource platform, 10,000+ users
