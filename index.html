@@ -102,6 +102,11 @@ button{font:inherit}
   min-height:100svh;overflow-anchor:none;
   padding:clamp(112px,13svh,152px) 0 clamp(72px,10svh,120px);
 }
+/* when the hero is just a kicker (sketchbook moved below) */
+.hero.kicker-only{
+  min-height:auto;
+  padding:clamp(112px,13svh,152px) 0 clamp(36px,5svh,60px);
+}
 .botany{
   position:absolute;bottom:0;width:clamp(120px,15vw,250px);opacity:.5;
   pointer-events:none;user-select:none;z-index:0;
@@ -124,8 +129,8 @@ button{font:inherit}
 @media (prefers-reduced-motion:reduce){.hero-down{animation:none;opacity:.5}}
 
 /* ---------------- sketchbook ---------------- */
-.hero,.hero *{-webkit-user-select:none;-moz-user-select:none;user-select:none}
-.hero img{-webkit-user-drag:none;user-drag:none}
+.hero,.hero *,.sb-section,.sb-section *{-webkit-user-select:none;-moz-user-select:none;user-select:none}
+.hero img,.sb-section img{-webkit-user-drag:none;user-drag:none}
 .sb-wrap{display:grid;justify-items:center;gap:clamp(34px,5vh,58px);width:100%;position:relative;z-index:2}
 .sb-stage{
   display:flex;align-items:center;justify-content:center;width:100%;
@@ -457,7 +462,92 @@ summary.plate::marker{content:''}
 
 /* the plate note: legible text on small screens, where the book is tiny */
 .plate .m{display:none}
+
+/* ---------- plates-sketchbook reveal ---------- */
+.plates-reveal{
+  overflow:hidden;max-height:0;opacity:0;
+  transition:max-height .65s cubic-bezier(.4,0,.2,1), opacity .45s ease .1s;
+}
+.plates-reveal.open{
+  max-height:4000px;opacity:1;
+  transition:max-height .65s cubic-bezier(.4,0,.2,1), opacity .45s ease;
+}
+.plates-reveal .sb-section{
+  position:relative;display:grid;justify-items:center;
+  padding:clamp(36px,5vh,60px) 0 clamp(48px,6vh,80px);
+}
+.plates-toggle{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:18px 4px;border:0;border-top:1px solid var(--hairline);
+  background:transparent;text-align:center;cursor:pointer;color:var(--ink-soft);
+  font-family:var(--font);font-size:12px;letter-spacing:var(--track-caps);text-transform:uppercase;
+  transition:color .22s ease,background-color .22s ease;
+}
+.plates-toggle:hover{color:var(--ink);background:rgba(255,252,244,.5)}
+.plates-toggle svg{width:12px;height:12px;transition:transform .35s ease}
+.plates-toggle.open svg{transform:rotate(180deg)}
+/* ---------- emdash publication card ---------- */
+.emdash-card{
+  border:1px solid var(--hairline);
+  background:rgba(255,252,244,.42);
+  padding:clamp(20px,2.4vw,28px);
+  margin-bottom:20px;
+  position:relative;
+  transition:border-color .22s ease, background-color .22s ease;
+}
+.emdash-card:hover{
+  border-color:rgba(43,39,33,.28);
+  background:rgba(255,252,244,.72);
+}
+.emdash-card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin-bottom:12px;flex-wrap:wrap;
+}
+.emdash-badge{
+  font-family:var(--font);font-size:11.5px;letter-spacing:var(--track-caps);
+  text-transform:uppercase;color:var(--earth);font-weight:600;
+  display:inline-flex;align-items:center;gap:7px;
+}
+.emdash-badge:before{
+  content:"";width:6px;height:6px;border-radius:50%;background:var(--earth);
+  display:inline-block;
+}
+.emdash-meta{
+  font-size:12px;color:var(--ink-faint);letter-spacing:.04em;font-weight:300;
+}
+.emdash-title{
+  font-family:var(--display);font-size:clamp(22px,2.2vw,28px);
+  font-weight:400;margin:0 0 10px;line-height:1.2;color:var(--ink);
+}
+.emdash-desc{
+  font-size:clamp(14.5px,1.35vw,16px);line-height:1.7;font-weight:300;
+  color:var(--ink-soft);margin:0 0 20px;max-width:68ch;
+}
+.emdash-actions{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.emdash-btn{
+  font-size:12px;letter-spacing:var(--track-caps);text-transform:uppercase;
+  padding:8px 16px;border:1px solid var(--hairline);transition:all .2s ease;
+  display:inline-flex;align-items:center;gap:6px;color:var(--ink);text-decoration:none;
+}
+.emdash-btn.primary{
+  background:var(--ink);color:var(--paper);border-color:var(--ink);
+}
+.emdash-btn.primary:hover{
+  background:var(--earth);border-color:var(--earth);color:var(--paper);
+}
+.emdash-btn.secondary{
+  background:transparent;color:var(--ink-soft);
+}
+.emdash-btn.secondary:hover{
+  color:var(--ink);border-color:var(--ink-soft);background:rgba(255,252,244,.6);
+}
 @media (max-width:640px){
+  .emdash-card{padding:18px 14px}
+  .emdash-card-header{flex-direction:column;align-items:flex-start;gap:6px}
+  .emdash-actions{flex-direction:column;align-items:stretch}
+  .emdash-btn{justify-content:center}
   .plate{grid-template-columns:2.6em minmax(0,1fr);row-gap:8px}
   .plate .p{grid-column:2;text-align:left}
   .plate .m{display:block;grid-column:2;font-size:14px;line-height:1.6;
@@ -476,6 +566,7 @@ summary.plate::marker{content:''}
     <nav>
       <a href="#work">Work</a>
       <a href="#writing">Writing</a>
+      <a href="https://blog.dmv.is-a.dev" target="_blank" rel="noopener">Blog ↗</a>
       <a href="#about">About</a>
       <a href="#plates">Rupin</a>
       <div class="top-socials">
@@ -487,45 +578,11 @@ summary.plate::marker{content:''}
     </nav>
   </header>
 
-  <section id="sketchbook" class="hero">
+  <section id="sketchbook" class="hero kicker-only">
     <img class="botany l" src="assets/botany-left.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
     <img class="botany r" src="assets/botany-right.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
 
     <p class="hero-kicker">I make the unglamorous parts correct @ Bengaluru</p>
-
-    <div class="sb-wrap" id="sbWrap">
-      <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-        <filter id="sb-mblur-1"><feGaussianBlur stdDeviation="5 0"/></filter>
-        <filter id="sb-mblur-2"><feGaussianBlur stdDeviation="14 0"/></filter>
-      </svg>
-      <div class="sb-stage" id="sbStage">
-        <button class="sb-arrow left" id="sbLeft" aria-label="previous page">
-          <svg viewBox="0 0 14 44" width="14" height="44" fill="none" aria-hidden="true"><polyline points="11,3 3,22 11,41" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <div class="sb-3d" id="sb3d">
-          <div class="sb-tilt" id="sbTilt">
-            <div class="sb-cast ambient" aria-hidden="true"></div>
-            <div class="sb-cast contact" aria-hidden="true"></div>
-            <div class="sb-cast hair" aria-hidden="true"></div>
-            <div class="sb-book" id="sbBook"></div>
-          </div>
-          <div class="zoomwrap" id="zoomWrap" aria-hidden="true"><div class="zoominner" id="zoomInner"></div></div>
-          <div class="loupe" id="loupe"><span class="grip"></span><span class="ring"><span class="lens" id="loupeLens"><span class="mag" id="loupeMag"></span></span></span></div>
-        </div>
-        <button class="sb-arrow right" id="sbRight" aria-label="next page">
-          <svg viewBox="0 0 14 44" width="14" height="44" fill="none" aria-hidden="true"><polyline points="3,3 11,22 3,41" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-      </div>
-      <div class="sb-captions" id="sbCaptions"></div>
-      <div class="sb-tools" role="group" aria-label="view controls">
-        <button class="tool" id="zOut" aria-label="zoom out"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8.6" cy="8.6" r="5.6"/><path d="M12.8 12.8 17.4 17.4M6.2 8.6h4.8"/></svg></button>
-        <span class="zoom-read" id="zRead">100%</span>
-        <button class="tool" id="zIn" aria-label="zoom in"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8.6" cy="8.6" r="5.6"/><path d="M12.8 12.8 17.4 17.4M6.2 8.6h4.8M8.6 6.2v4.8"/></svg></button>
-        <span class="tool-sep" aria-hidden="true"></span>
-        <button class="tool" id="loupeBtn" aria-label="magnifier" aria-pressed="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8.8" cy="8.8" r="5.8"/><path d="M13 13l4.4 4.4"/><path d="M6.4 7.2a3.2 3.2 0 0 1 2.4-1.4" opacity=".55"/></svg></button>
-      </div>
-      <p class="sb-hint" id="sbHint">Drag the page to turn · Drag the glass across it</p>
-    </div>
 
     <button class="hero-down" id="heroDown" aria-label="scroll to about">
       <svg viewBox="0 0 44 22" width="34" height="17" fill="none" aria-hidden="true">
@@ -606,9 +663,27 @@ summary.plate::marker{content:''}
   <div class="rule short" aria-hidden="true"></div>
 
   <section id="writing" class="plates">
-    <p class="section-label">Writing</p>
+    <p class="section-label">Writing &mdash; Cloudflare EmDash</p>
+    <div class="emdash-card">
+      <div class="emdash-card-header">
+        <span class="emdash-badge">Cloudflare EmDash</span>
+        <span class="emdash-meta">Astro &middot; Cloudflare Workers &middot; D1 &middot; R2</span>
+      </div>
+      <h3 class="emdash-title">The Engineering Journal</h3>
+      <p class="emdash-desc">Long-form writing on append-only ledgers, idempotent webhooks, distributed concurrency, and the unglamorous parts of system correctness.</p>
+      <div class="emdash-actions">
+        <a href="https://blog.dmv.is-a.dev" target="_blank" rel="noopener" class="emdash-btn primary">Read Publication <span>&rarr;</span></a>
+        <a href="https://blog.dmv.is-a.dev/_emdash/admin" target="_blank" rel="noopener" class="emdash-btn secondary">Admin Studio <span>&rarr;</span></a>
+      </div>
+    </div>
     <ol class="plate-list" id="writingList">
-      <li><p class="empty">Nothing published yet. The first pieces will be about the bugs above &mdash; the duplicate delivery, the poisoned transaction, the counter that stopped counting.</p></li>
+      <li>
+        <a class="plate" href="writing/how-we-run-a-bootstrapped-ai-startup-on-almost-zero-operating-costs.html">
+          <span class="n">01</span>
+          <span class="t">How We Run a Bootstrapped AI Startup on Almost Zero Operating Costs</span>
+          <span class="p">Nov 2026 &middot; 8 min read</span>
+        </a>
+      </li>
     </ol>
   </section>
 
@@ -617,6 +692,47 @@ summary.plate::marker{content:''}
   <section id="plates" class="plates">
     <p class="section-label">Plates &mdash; Rupin Pass, June 2025</p>
     <ol class="plate-list" id="plateList"></ol>
+    <button class="plates-toggle" id="platesToggle" aria-expanded="false" aria-controls="platesReveal">
+      Open Sketchbook
+      <svg viewBox="0 0 12 12" fill="none" aria-hidden="true"><polyline points="2,4 6,8 10,4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="plates-reveal" id="platesReveal">
+      <div class="sb-section">
+        <div class="sb-wrap" id="sbWrap">
+          <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+            <filter id="sb-mblur-1"><feGaussianBlur stdDeviation="5 0"/></filter>
+            <filter id="sb-mblur-2"><feGaussianBlur stdDeviation="14 0"/></filter>
+          </svg>
+          <div class="sb-stage" id="sbStage">
+            <button class="sb-arrow left" id="sbLeft" aria-label="previous page">
+              <svg viewBox="0 0 14 44" width="14" height="44" fill="none" aria-hidden="true"><polyline points="11,3 3,22 11,41" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="sb-3d" id="sb3d">
+              <div class="sb-tilt" id="sbTilt">
+                <div class="sb-cast ambient" aria-hidden="true"></div>
+                <div class="sb-cast contact" aria-hidden="true"></div>
+                <div class="sb-cast hair" aria-hidden="true"></div>
+                <div class="sb-book" id="sbBook"></div>
+              </div>
+              <div class="zoomwrap" id="zoomWrap" aria-hidden="true"><div class="zoominner" id="zoomInner"></div></div>
+              <div class="loupe" id="loupe"><span class="grip"></span><span class="ring"><span class="lens" id="loupeLens"><span class="mag" id="loupeMag"></span></span></span></div>
+            </div>
+            <button class="sb-arrow right" id="sbRight" aria-label="next page">
+              <svg viewBox="0 0 14 44" width="14" height="44" fill="none" aria-hidden="true"><polyline points="3,3 11,22 3,41" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <div class="sb-captions" id="sbCaptions"></div>
+          <div class="sb-tools" role="group" aria-label="view controls">
+            <button class="tool" id="zOut" aria-label="zoom out"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8.6" cy="8.6" r="5.6"/><path d="M12.8 12.8 17.4 17.4M6.2 8.6h4.8"/></svg></button>
+            <span class="zoom-read" id="zRead">100%</span>
+            <button class="tool" id="zIn" aria-label="zoom in"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8.6" cy="8.6" r="5.6"/><path d="M12.8 12.8 17.4 17.4M6.2 8.6h4.8M8.6 6.2v4.8"/></svg></button>
+            <span class="tool-sep" aria-hidden="true"></span>
+            <button class="tool" id="loupeBtn" aria-label="magnifier" aria-pressed="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8.8" cy="8.8" r="5.8"/><path d="M13 13l4.4 4.4"/><path d="M6.4 7.2a3.2 3.2 0 0 1 2.4-1.4" opacity=".55"/></svg></button>
+          </div>
+          <p class="sb-hint" id="sbHint">Drag the page to turn · Drag the glass across it</p>
+        </div>
+      </div>
+    </div>
   </section>
 
   <div class="rule short" aria-hidden="true"></div>
@@ -980,6 +1096,36 @@ document.getElementById('heroDown').onclick=()=>{
   document.getElementById('about').scrollIntoView({behavior:'smooth',block:'start'});
 };
 
+/* ------------------------------------------- plates-sketchbook toggle */
+const platesToggle=document.getElementById('platesToggle');
+const platesReveal=document.getElementById('platesReveal');
+let sbBooted=false;
+function openSketchbook(pageIdx){
+  if(!platesReveal.classList.contains('open')){
+    platesReveal.classList.add('open');
+    platesToggle.classList.add('open');
+    platesToggle.setAttribute('aria-expanded','true');
+    platesToggle.firstChild.textContent='Close Sketchbook ';
+  }
+  if(!sbBooted){sbBooted=true;bootSketchbook();}
+  if(typeof pageIdx==='number')goTo(pageIdx);
+  setTimeout(()=>{
+    platesReveal.scrollIntoView({behavior:'smooth',block:'center'});
+    layout();
+    if(typeof restLoupe==='function')restLoupe();
+  },80);
+}
+function closeSketchbook(){
+  platesReveal.classList.remove('open');
+  platesToggle.classList.remove('open');
+  platesToggle.setAttribute('aria-expanded','false');
+  platesToggle.firstChild.textContent='Open Sketchbook ';
+}
+platesToggle.onclick=()=>{
+  if(platesReveal.classList.contains('open'))closeSketchbook();
+  else openSketchbook();
+};
+
 /* --------------------------------------------------- loupe + controls */
 const loupe=document.getElementById('loupe');
 const lens=document.getElementById('loupeLens');
@@ -1117,7 +1263,7 @@ PAGES.forEach((p,i)=>{
   b.querySelector('.t').textContent=p.title;
   b.querySelector('.p').textContent=p.place;
   b.querySelector('.m').textContent=p.note;
-  b.onclick=()=>{goTo(i);document.getElementById('sketchbook').scrollIntoView({behavior:'smooth',block:'center'});};
+  b.onclick=()=>{openSketchbook(i);};
   li.appendChild(b);plateList.appendChild(li);
 });
 function marks(){
@@ -1166,26 +1312,27 @@ const mailIcon=document.querySelector('.icon-btn[data-mail]');
 if(mailIcon)mailIcon.href='mailto:'+atob("Z293ZGFkaXZpamFAZ21haWwuY29t");
 
 /* ------------------------------------------------------------- boot */
-(async function boot(){
+function bootSketchbook(){
   idx=Q.has('shot')?(parseInt(Q.get('shot'),10)||0)%M:0;
   paint();applyView();
-  /* only the pages the opening riffle actually crosses; the rest arrive
-     as they are turned to, so first paint is not gated on 18 spreads */
+  /* warm the pages the opening might show */
   const warm=new Set([idx,LAND]);
   for(let k=0;k<=INTRO_STEPS;k++)warm.add((LAND-INTRO_STEPS+k+M*2)%M);
-  await Promise.all([...warm].map(i=>{
+  Promise.all([...warm].map(i=>{
     const im=new Image();im.src=PAGES[i].url;
     return im.decode?im.decode().catch(()=>{}):new Promise(r=>{im.onload=im.onerror=r});
-  }));
-  requestIdleCallback?.(()=>PAGES.forEach(p=>{const im=new Image();im.src=p.url;}));
-  if(document.fonts&&document.fonts.ready)await document.fonts.ready.catch(()=>{});
+  })).then(()=>{
+    requestIdleCallback?.(()=>PAGES.forEach(p=>{const im=new Image();im.src=p.url;}));
+  });
   syncZoom();restLoupe();
+  if(Q.has('shot')&&Q.has('t')){startTurn(Q.get('dir')||'next',parseFloat(Q.get('t')));}
+}
+(async function boot(){
+  /* decode contacts immediately */
+  if(document.fonts&&document.fonts.ready)await document.fonts.ready.catch(()=>{});
   document.body.dataset.ready='1';
-  if(Q.has('shot')){
-    if(Q.has('t')){startTurn(Q.get('dir')||'next',parseFloat(Q.get('t')));}
-    return;
-  }
-  setTimeout(startIntro,220);
+  /* if a direct ?shot= link, open the sketchbook right away */
+  if(Q.has('shot')){openSketchbook(parseInt(Q.get('shot'),10)||0);}
 })();
 </script>
 </body>

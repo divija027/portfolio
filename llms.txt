@@ -12,3 +12,4 @@ survive the buyer closing the tab, and multi-tenant row isolation.
 - [GitHub](https://github.com/divija027): source, including this site
 - [LinkedIn](https://www.linkedin.com/in/divijamv): contact and work history
 - [BrainReef](https://brainreef.in): student resource platform, 10,000+ users
+- [Writing: How We Run a Bootstrapped AI Startup on Almost Zero Operating Costs](https://dmv.is-a.dev/writing/how-we-run-a-bootstrapped-ai-startup-on-almost-zero-operating-costs.html): architectural and cost breakdown of running an AI startup stack on startup credits and free tiers

@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How We Run a Bootstrapped AI Startup on Almost Zero Operating Costs — Divija MV</title>
+<meta name="description" content="A practical breakdown of how BrainReef ran its LLM, STT/TTS, database, scraping, and observability infrastructure using startup programs, credits, and free tiers without paying out of pocket.">
+<link rel="canonical" href="https://dmv.is-a.dev/writing/how-we-run-a-bootstrapped-ai-startup-on-almost-zero-operating-costs.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://dmv.is-a.dev/writing/how-we-run-a-bootstrapped-ai-startup-on-almost-zero-operating-costs.html">
+<meta property="og:title" content="How We Run a Bootstrapped AI Startup on Almost Zero Operating Costs">
+<meta property="og:description" content="A practical breakdown of how BrainReef ran its LLM, STT/TTS, database, scraping, and observability infrastructure using startup programs, credits, and free tiers.">
+<meta property="og:image" content="https://dmv.is-a.dev/assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@07Divij">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23ece7dc'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' text-anchor='middle' fill='%232b2721'%3ED%3C/text%3E%3C/svg%3E">
+<style>
+@font-face{font-family:'Instrument Serif';font-style:normal;font-weight:400;font-display:block;
+  src:url(../assets/instrument-serif.woff2) format('woff2')}
+@font-face{font-family:'Instrument Serif';font-style:italic;font-weight:400;font-display:block;
+  src:url(../assets/instrument-serif-italic.woff2) format('woff2')}
+@font-face{font-family:'Newsreader';font-style:normal;font-weight:200 600;font-display:swap;
+  src:url(../assets/newsreader.woff2) format('woff2')}
+
+:root{
+  --paper:#ece7dc;
+  --ink:#2b2721;
+  --ink-soft:rgba(43,39,33,.82);
+  --ink-faint:rgba(43,39,33,.65);
+  --hairline:rgba(43,39,33,.14);
+  --earth:#7d5124;
+  --display:'Instrument Serif',"New York",Georgia,'Times New Roman',serif;
+  --font:'Newsreader',"New York",Georgia,'Times New Roman',serif;
+  --track-caps:.24em;
+  --track-nav:.06em;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font);font-weight:400;background:var(--paper);color:var(--ink);
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+a{color:inherit;text-decoration:underline;text-decoration-color:var(--hairline);text-underline-offset:3px;transition:text-decoration-color .2s,color .2s}
+a:hover{text-decoration-color:var(--ink);color:var(--ink)}
+::selection{background:rgba(43,39,33,.85);color:var(--paper)}
+
+.wash{
+  position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:url(../assets/bg-wash.jpg) center top / cover no-repeat;
+  opacity:.85;
+}
+.wash:after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(236,231,220,.25) 0%,rgba(236,231,220,.72) 58%,var(--paper) 88%);
+}
+
+/* ---------------- top bar ---------------- */
+.top{
+  position:fixed;top:0;left:0;right:0;z-index:500;
+  display:flex;align-items:center;justify-content:space-between;
+  padding-inline:clamp(16px,4vw,48px);padding-block:16px 24px;pointer-events:none;
+}
+.top>*{pointer-events:auto}
+.top:before{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(180deg,rgba(240,236,226,.95),rgba(240,236,226,.75) 60%,rgba(240,236,226,0));
+  -webkit-backdrop-filter:blur(14px) saturate(.95);backdrop-filter:blur(14px) saturate(.95);
+  -webkit-mask-image:linear-gradient(180deg,#000 60%,transparent);
+  mask-image:linear-gradient(180deg,#000 60%,transparent);
+}
+.top .brand{
+  font-family:var(--display);font-size:clamp(22px,2.2vw,28px);letter-spacing:.01em;
+  white-space:nowrap;line-height:1;text-decoration:none;
+}
+.top nav{
+  display:flex;gap:clamp(12px,1.8vw,22px);font-size:14.5px;align-items:center;
+  letter-spacing:var(--track-nav);font-weight:300;
+}
+.top nav a{color:var(--ink-soft);text-decoration:none}
+.top nav a:hover{color:var(--ink)}
+
+/* ---------------- article container ---------------- */
+.article-wrap{
+  max-width:720px;margin:0 auto;padding:clamp(100px,14vh,140px) clamp(20px,5vw,32px) clamp(64px,10vh,100px);
+}
+.article-header{margin-bottom:clamp(32px,5vw,48px)}
+.kicker{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  font-size:12px;letter-spacing:var(--track-caps);text-transform:uppercase;
+  color:var(--ink-faint);margin:0 0 16px;
+}
+.kicker .badge{
+  color:var(--earth);font-weight:600;display:inline-flex;align-items:center;gap:6px;
+}
+.kicker .badge:before{
+  content:"";width:5px;height:5px;border-radius:50%;background:var(--earth);display:inline-block;
+}
+h1{
+  font-family:var(--display);font-size:clamp(32px,4.5vw,48px);line-height:1.15;
+  font-weight:400;margin:0 0 20px;color:var(--ink);
+}
+.byline{
+  font-size:14px;color:var(--ink-faint);font-weight:300;display:flex;gap:10px;align-items:center;
+}
+.rule{
+  width:100%;height:1px;background:var(--hairline);margin:36px 0;
+}
+.rule.short{max-width:90px;margin:42px auto}
+
+/* ---------------- prose ---------------- */
+.prose{font-size:clamp(16.5px,1.3vw,18px);line-height:1.75;color:var(--ink-soft);font-weight:350}
+.prose p{margin:0 0 1.45em}
+.prose h2{
+  font-family:var(--display);font-size:clamp(26px,2.8vw,34px);line-height:1.2;
+  font-weight:400;margin:2em 0 .6em;color:var(--ink);
+}
+.prose h3{
+  font-family:var(--display);font-size:clamp(21px,2.2vw,26px);line-height:1.25;
+  font-weight:400;margin:1.6em 0 .5em;color:var(--ink);
+}
+.prose ul,.prose ol{margin:0 0 1.45em;padding-left:1.3em}
+.prose li{margin-bottom:.55em}
+.prose strong{font-weight:600;color:var(--ink)}
+.prose code{
+  font-family:monospace;font-size:.88em;background:rgba(43,39,33,.06);
+  padding:2px 5px;border-radius:3px;
+}
+
+/* ---------------- table ---------------- */
+.table-wrap{
+  overflow-x:auto;margin:1.8em 0;border:1px solid var(--hairline);background:rgba(255,252,244,.5);
+}
+table{
+  width:100%;border-collapse:collapse;text-align:left;font-size:15px;
+}
+th,td{
+  padding:11px 16px;border-bottom:1px solid var(--hairline);
+}
+th{
+  font-family:var(--font);font-size:12px;letter-spacing:var(--track-caps);
+  text-transform:uppercase;color:var(--ink-faint);font-weight:600;background:rgba(255,252,244,.8);
+}
+tr:last-child td{border-bottom:0}
+td:not(:first-child),th:not(:first-child){text-align:right}
+
+/* ---------------- figures ---------------- */
+figure{margin:2em 0;padding:0}
+figure img{
+  width:100%;height:auto;display:block;border:1px solid var(--hairline);
+  background:#fff;box-shadow:0 6px 18px rgba(43,39,33,.04);
+}
+figcaption{
+  font-size:12.5px;color:var(--ink-faint);letter-spacing:.02em;
+  margin-top:9px;text-align:center;font-style:italic;
+}
+
+/* ---------------- callout ---------------- */
+.callout{
+  border-left:2px solid var(--earth);padding:14px 18px;margin:1.8em 0;
+  background:rgba(255,252,244,.6);font-size:15.5px;line-height:1.65;
+}
+.callout p:last-child{margin-bottom:0}
+
+/* ---------------- author footer ---------------- */
+.author-card{
+  border:1px solid var(--hairline);background:rgba(255,252,244,.4);
+  padding:clamp(20px,3vw,28px);margin-top:54px;display:flex;gap:20px;align-items:center;
+}
+.author-info h4{
+  font-family:var(--display);font-size:22px;margin:0 0 6px;font-weight:400;color:var(--ink);
+}
+.author-info p{
+  font-size:14px;line-height:1.6;color:var(--ink-soft);margin:0;font-weight:300;
+}
+.article-nav{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:36px;
+  font-size:13px;letter-spacing:var(--track-caps);text-transform:uppercase;
+}
+.article-nav a{text-decoration:none;color:var(--ink-faint);transition:color .2s}
+.article-nav a:hover{color:var(--ink)}
+
+@media (max-width:640px){
+  .top{padding-inline:14px;padding-block:12px 18px}
+  .top .brand{font-size:20px}
+  .top nav{font-size:13px;gap:12px}
+  .author-card{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<div class="wash" aria-hidden="true"></div>
+
+<header class="top">
+  <a class="brand" href="../#writing">&larr; Divija MV</a>
+  <nav>
+    <a href="../#work">Work</a>
+    <a href="../#writing">Writing</a>
+    <a href="https://blog.dmv.is-a.dev" target="_blank" rel="noopener">Blog &#x2197;</a>
+    <a href="../#about">About</a>
+  </nav>
+</header>
+
+<main class="article-wrap">
+  <header class="article-header">
+    <div class="kicker">
+      <span class="badge">Retrospective</span>
+      <time datetime="2026-11-10">10 November 2026 &middot; 8 min read</time>
+    </div>
+    <h1>How We Run a Bootstrapped AI Startup on Almost Zero Operating Costs</h1>
+    <div class="byline">
+      <span>By Divija MV</span>
+      <span>&middot;</span>
+      <span>Former Co-Founder &amp; CTO, BrainReef</span>
+    </div>
+  </header>
+
+  <article class="prose">
+    <p>I was the co-founder and CTO of an AI-based ed-tech <a href="https://brainreef.in/" target="_blank" rel="noopener">startup</a>. I left the startup in October 2026 to spend time on other fields I’m interested in, particularly inference engineering, which I’m currently learning. Before moving on, I wanted to write down how we ran most of the product infrastructure without paying for every SaaS service out of pocket.</p>
+
+    <p>The product had an LLM chat flow and an AI mock-interview feature, so we needed quite a few services: LLMs, speech-to-text, text-to-speech, databases, analytics, error tracking, scraping, monitoring, email and the usual infrastructure around all of that.</p>
+
+    <p>The SaaS bill was much smaller than it could have been. Salaries were still salaries, and compute was not free. We bought a two-year VPS plan, and there were a few other small costs. But most of the services around the product were covered by startup programs, credits or free tiers.</p>
+
+    <p>We were bootstrapped. We didn’t get most of these through a VC referral or some accelerator network. I mostly found the programs, filled out the forms and applied. Here’s what we got and what we actually used. This is a snapshot of the setup while I was there, not a claim that I’m still operating the startup today.</p>
+
+    <div class="callout">
+      <p><strong>Note on availability:</strong> These are the offers our accounts received. They are not guaranteed terms for every startup, and credits or free tiers can change. Some of these grants also expire.</p>
+    </div>
+
+    <h2>The AI part</h2>
+
+    <h3>LLM: Sarvam</h3>
+    <p>We needed an LLM first, so we applied to the <a href="https://www.sarvam.ai/startup-program" target="_blank" rel="noopener">Sarvam Startup Program</a> and got accepted. We received &#x20B9;25,000 (roughly US$267) in credits. The bigger benefit for us was the Business-tier allocation attached to our account: 1,000 rpm. The program allocation was valid for six months.</p>
+
+    <figure>
+      <img src="../assets/writing/sarvam-allocation.png" alt="Sarvam Startup Program business tier 1000 RPM allocation" loading="lazy">
+      <figcaption>Sarvam Business-tier allocation (1,000 RPM) granted under the startup program.</figcaption>
+    </figure>
+
+    <p>We used Sarvam-105B for general chat completions and reasoning. It isn’t the model I would choose for every possible task, but our use case was fairly contained. For the things we asked it to do, it was more than enough.</p>
+
+    <p>The 1,000 RPM figure was specific to the allocation we received. It is not a number I’d assume every Sarvam account gets. Sarvam publishes separate limits for different APIs in its <a href="https://docs.sarvam.ai/api/getting-started/pricing" target="_blank" rel="noopener">rate-limit documentation</a>, so check the dashboard rather than treating the LLM quota as a limit for every service.</p>
+
+    <p>There is also a useful detail about the normal API pricing for Sarvam-105B. At the published rates, input is &#x20B9;15, cached input is &#x20B9;5 and output is &#x20B9;60 per 1M tokens.</p>
+
+    <p>Using the <a href="https://waverate.app/rates/usd-to-inr" target="_blank" rel="noopener">10 November 2026 USD/INR reference rate</a> of approximately &#x20B9;93.85 to US$1, those work out to roughly US$0.16 input, US$0.05 cached input and US$0.64 output per 1M tokens. These are rounded conversions, not USD prices charged by Sarvam. The INR prices exclude GST.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Sarvam-105B pricing</th>
+            <th>INR per 1M tokens</th>
+            <th>Approx. USD per 1M tokens</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Input</td>
+            <td>&#x20B9;15.00</td>
+            <td>US$0.16</td>
+          </tr>
+          <tr>
+            <td>Cached input</td>
+            <td>&#x20B9;5.00</td>
+            <td>US$0.05</td>
+          </tr>
+          <tr>
+            <td>Output</td>
+            <td>&#x20B9;60.00</td>
+            <td>US$0.64</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The pricing is on <a href="https://www.sarvam.ai/api-pricing" target="_blank" rel="noopener">Sarvam’s API pricing page</a> and the <a href="https://www.sarvam.ai/token-factory/models/sarvam-105b" target="_blank" rel="noopener">Sarvam-105B model page</a>. The exchange-rate conversion is only a rough comparison and will move with USD/INR.</p>
+
+    <h3>Speech: Deepgram, ElevenLabs and Sarvam</h3>
+    <p>The mock-interview feature needs speech-to-text and text-to-speech. A candidate speaks, we transcribe the answer, send it to the LLM, generate the next question and speak that question back. It is a loop, not one LLM call at the beginning and one at the end.</p>
+
+    <p>For STT and TTS, we applied to the <a href="https://deepgram.com/startup-program" target="_blank" rel="noopener">Deepgram Startup Program</a>. They gave us US$1,000 in credits to start with and offered a path to request more, up to US$10,000 over a year, after the initial credits are used.</p>
+
+    <p>The credits were useful, but the thing we had to design around was concurrency. Deepgram's <a href="https://developers.deepgram.com/reference/api-rate-limits" target="_blank" rel="noopener">rate-limit documentation</a> separates streaming STT and streaming TTS limits. They vary by model, region and plan, and are applied per project, not per API key. On the India endpoint, the published limits include up to 150 concurrent streaming STT requests and up to 45 concurrent Aura/Aura-2 streaming TTS requests. Those are concurrent requests, not requests per minute.</p>
+
+    <p>We added a fallback path for TTS. When Deepgram is at its limit or starts rejecting requests, the next generation can go to another provider. The switch happens in the backend, so the candidate does not need to know which provider generated that particular response.</p>
+
+    <p>For the next layer, we applied for the <a href="https://elevenlabs.io/grants-application" target="_blank" rel="noopener">ElevenLabs Grants Program</a>. We received 33,010,000 credits for STT and TTS, another 1,000,000 credits for image and video, and a Scale subscription at no cost. That subscription was valid for a year. The only condition is you need to put their logo somewhere in your website like this.</p>
+
+    <figure>
+      <img src="../assets/writing/elevenlabs-badge.png" alt="ElevenLabs logo placement badge requirement" loading="lazy">
+      <figcaption>ElevenLabs grant requirement badge placement on site.</figcaption>
+    </figure>
+
+    <p>ElevenLabs has been a useful backup. Its <a href="https://elevenlabs.io/docs/overview/models" target="_blank" rel="noopener">published model limits</a> split concurrency by model family: the Scale figures are 15 for Multilingual v2 TTS, 30 for Flash TTS, and 45 for realtime STT. Startup-grant accounts receive Scale-level benefits. So “Scale concurrency” is not one universal number. The model and API you use matter. Their <a href="https://elevenlabs.io/blog/ai-rate-limiting-for-voice" target="_blank" rel="noopener">rate-limiting write-up</a> explains the difference between request rate and concurrent generation, and why WebSockets can help for conversational workloads.</p>
+
+    <p>We also added Sarvam STT and TTS as another fallback. That gives us another option when there is a sudden increase in interview traffic or one provider is having a bad day. I had also applied to the <a href="https://startup.z.ai/" target="_blank" rel="noopener">GLM startup program</a>, but we did not get accepted.</p>
+
+    <h2>The rest of the infrastructure</h2>
+
+    <h3>Cloudflare</h3>
+    <p>Next was <a href="https://www.cloudflare.com/startups/" target="_blank" rel="noopener">Cloudflare for Startups</a>. We received US$10,000 in Cloudflare credits, which made a big difference because we relied on Cloudflare for a lot of things: CDN, caching, security, R2 storage, Workers, Durable Objects, Realtime, Zero Trust, SSL/TLS, DNS and D1.</p>
+
+    <p>It let us use paid Cloudflare features that we probably would have avoided paying for this early. We already had a lot of the product sitting on Cloudflare, so the credits went towards things we were actually using rather than some service we signed up for just because it was free.</p>
+
+    <h3>Product analytics and error tracking</h3>
+    <p>For analytics, we used <a href="https://posthog.com/startups" target="_blank" rel="noopener">PostHog</a>. We applied to its startup program, got accepted and received US$50,000 in credits. We used it for feature flags, product analytics and surveys. They also sent us some merchandise, which somehow made its way all the way from Loveland, Ohio.</p>
+
+    <p>For error tracking, we used <a href="https://sentry.io/for/startups/apply/" target="_blank" rel="noopener">Sentry</a>. We got accepted into its startup program and received US$5,000 in credits.</p>
+
+    <h3>Database</h3>
+    <p>Our managed database was <a href="https://neon.com/startups" target="_blank" rel="noopener">Neon</a>. Its startup program gave us US$1,000 in credits. That was enough for what we were doing at the time.</p>
+
+    <figure>
+      <img src="../assets/writing/neon-credits.png" alt="Neon startup program credits balance" loading="lazy">
+      <figcaption>Neon startup credits balance applied to managed Postgres database.</figcaption>
+    </figure>
+
+    <h3>Scraping and browser automation</h3>
+    <p>We used a few different services internally for scraping and browser work: Firecrawl, Tavily, TinyFish, <a href="https://developers.cloudflare.com/browser-run/" target="_blank" rel="noopener">Cloudflare Browser Run</a> and Context.dev. There are quite a few providers in this space, and many of them have startup credits or a free tier. I preferred keeping these integrations behind separate adapters so that changing a provider did not mean rewriting the rest of the backend. TinyFish is probably my favourite of the group.</p>
+
+    <p>A lot of people end up paying for managed scraping solutions for sites with heavier bot protection. For Reddit, I found <a href="https://arctic-shift.photon-reddit.com/" target="_blank" rel="noopener">Arctic Shift</a>, which provides an archive, a limited API and bulk data dumps. It has been a useful alternative to paying for a scraper just to query archived posts and comments. The project does not promise uptime, so I would not make it a critical dependency without another fallback.</p>
+
+    <p>For LinkedIn-related data collection, Bright Data's free tier has been useful for our limited needs. I would still check the current terms and usage limits before building a production dependency around any free tier.</p>
+
+    <h3>Secrets, monitoring and compute</h3>
+    <p>For secrets management, we used <a href="https://infisical.com/docs/self-hosting/overview" target="_blank" rel="noopener">Infisical</a>. Its free tier was enough for our workflow. You can also self-host it if you want to own that part of the setup.</p>
+
+    <p>For monitoring, we used <a href="https://betterstack.com/" target="_blank" rel="noopener">Better Stack</a>. Its free tier was enough for us at the time. We also got into the Datadog startup program and received US$100,000 in credits, but Datadog felt like overkill for our size at the time. Having credits does not mean you need to add another system to your stack.</p>
+
+    <p>For compute, we could have applied to the AWS, GCP or Azure startup programs. We had already bought a two-year Hostinger VPS plan during a Black Friday sale, though, and it was cheap enough that moving everything to a PaaS did not make sense for us. PaaS would have been another abstraction and another bill without solving a problem we currently have.</p>
+
+    <p>We also used <a href="https://tailscale.com/" target="_blank" rel="noopener">Tailscale</a>. Its free tier was generous enough for the setup we had at the time.</p>
+
+    <h3>Collaboration and the smaller pieces</h3>
+    <p>We got accepted into the <a href="https://clickup.com/startup-program" target="_blank" rel="noopener">ClickUp Startup Program</a>, which we used for organising work and collaboration. We also used Slack's free plan.</p>
+
+    <p>For transactional email, we used <a href="https://resend.com/" target="_blank" rel="noopener">Resend</a> on the free tier at the time. The startup-credit route we found was aimed at YC companies, so it was not something we could use.</p>
+
+    <p>For code execution, we ran our own Docker container using <a href="https://github.com/engineer-man/piston" target="_blank" rel="noopener">Piston</a>. That means we do not need to pay for a separate API-based code execution service.</p>
+
+    <p>We used the <a href="https://ai-sdk.dev/" target="_blank" rel="noopener">Vercel AI SDK</a> as well. It makes it easier to try different model providers without importing and configuring a different SDK every time. That mattered when we were using multiple providers and wanted the option to switch between them.</p>
+
+    <p>One useful directory for finding these offers is <a href="https://startupperks.si/" target="_blank" rel="noopener">Startup Perks</a>. Also, Firecrawl currently advertises 10,000 credits for verified students through its <a href="https://www.firecrawl.dev/student-program" target="_blank" rel="noopener">student program</a>. Check the eligibility terms: the student offer is intended for educational or personal projects, so I would not assume it can be used for production startup traffic.</p>
+
+    <p>A few other programs worth looking at are Customer.io, Intercom's startup offering for Fin, and incident.io.</p>
+
+    <h2>So how many mock interviews could this setup handle at once?</h2>
+    <p>This was the number I wanted to work out, because “we had 1,000 RPM” did not tell us how many people can be in an interview at the same time.</p>
+
+    <p>Our mock interview flow made roughly 15–25 LLM requests over the full interview. The exact number depends on the candidate, because every answer goes back to the LLM and the next question is generated dynamically.</p>
+
+    <p>Assume a 30-minute interview and our account-specific 1,000 RPM LLM allocation. The average-rate calculation looks like this:</p>
+    <ul>
+      <li>At 25 LLM requests per interview: 1,000 &times; 30 &divide; 25 = <strong>1,200 concurrent interviews</strong>.</li>
+      <li>At 15 LLM requests per interview: 1,000 &times; 30 &divide; 15 = <strong>2,000 concurrent interviews</strong>.</li>
+    </ul>
+
+    <p>That is the theoretical LLM ceiling if requests are spread evenly across the interview. It is not a safe production target: candidates can answer at the same time, requests arrive in bursts, and RPM does not tell you how many requests are in flight. I would keep headroom rather than run the quota at 100%.</p>
+
+    <p>For a live voice interview, streaming STT is a more direct constraint. If each interview holds one streaming STT connection for the duration of the session, the published limits we can use as reference points are:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Provider</th>
+            <th>Streaming STT limit used in this estimate</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a href="https://developers.deepgram.com/reference/api-rate-limits" target="_blank" rel="noopener">Deepgram, India endpoint</a></td>
+            <td>150 concurrent requests</td>
+          </tr>
+          <tr>
+            <td><a href="https://elevenlabs.io/docs/overview/models" target="_blank" rel="noopener">ElevenLabs, Scale realtime STT</a></td>
+            <td>45 concurrent requests</td>
+          </tr>
+          <tr>
+            <td><a href="https://docs.sarvam.ai/api/getting-started/pricing" target="_blank" rel="noopener">Sarvam, public Growth WebSocket STT limit</a></td>
+            <td>100 concurrent connections</td>
+          </tr>
+          <tr>
+            <td><strong>Combined reference ceiling</strong></td>
+            <td><strong>295 concurrent streams</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>If the application can distribute new STT streams across all three providers, that gives a theoretical ceiling of about 295 simultaneous interviews. Keeping 20% headroom puts the planning number at roughly <strong>235 concurrent interviews</strong>.</p>
+
+    <p>If STT only uses Deepgram and the other providers are only TTS fallbacks, the number is different: Deepgram's 150 streaming STT requests become the ceiling, and I would plan around <strong>120 interviews</strong> with the same 20% headroom. The higher 235 estimate assumes STT failover or routing is also wired up across ElevenLabs and Sarvam.</p>
+
+    <p>TTS needs to be looked at separately. Deepgram lists up to 45 concurrent Aura/Aura-2 streaming TTS requests in India. ElevenLabs Scale lists 15 concurrent Multilingual v2 TTS requests or 30 Flash requests. Sarvam's public Growth limits list up to 1,000 concurrent TTS WebSocket connections. Those are published plan references, not proof of the exact limits on our startup-program accounts. These are generation slots, not one slot permanently reserved for each interview. A slot is occupied while audio is being generated; with WebSocket streaming, idle time does not consume the same capacity as an active generation.</p>
+
+    <p>So I would not add the TTS limits to the STT limits and call that our interview capacity. The actual TTS ceiling depends on how often each interviewer speaks, how long each audio generation takes, which model we use, and whether those requests arrive in a burst. ElevenLabs specifically says that on its TTS WebSocket only active generation time counts; an idle open socket does not use a slot in the same way. Other providers have their own endpoint-specific accounting. Those things would need to be measured under load. The provider response headers and our own metrics are more useful than a single number on a pricing page.</p>
+
+    <p>There is one important Sarvam caveat here. The 1,000 RPM number above is the LLM allocation we received. Sarvam publishes different limits for LLM, STT and TTS, and the public limits are not the same thing as a custom startup-program allocation. For the estimate above I used the published Growth STT WebSocket figure as a reference. The exact number for our Business-tier account would need to come from the account's rate-limit dashboard.</p>
+
+    <p>Based on those published limits, about 235 concurrent interviews would be the planning estimate if all three STT providers are available for routing. It is not a load-test result or a promise that we can sustain that number under every workload. That estimate would still need a proper load test with realistic answer lengths, audio durations, provider failover and request bursts.</p>
+
+    <h2>What I took away from this</h2>
+    <p>You do not need to pay for every SaaS product from day one. A lot of companies have startup programs, student programs or free tiers, and applying directly can get you a useful amount of capacity even without a VC introduction.</p>
+
+    <p>But credits are not an architecture. They expire, provider limits are different, free tiers change, and a service being free does not make it reliable. I tried to keep provider integrations swappable, watch actual usage and have a fallback for the parts of the product that could not go down.</p>
+
+    <p>The goal was never to collect the most credits. It was to get the product running without adding a monthly bill for every piece of infrastructure before we actually needed to pay for it.</p>
+  </article>
+
+  <div class="rule"></div>
+
+  <footer class="author-card">
+    <div class="author-info">
+      <h4>Divija MV</h4>
+      <p>Backend-leaning TypeScript engineer in Bengaluru. Former Co-Founder &amp; CTO at BrainReef. Exploring inference engineering, append-only ledgers, and systems correctness.</p>
+    </div>
+  </footer>
+
+  <nav class="article-nav">
+    <a href="../#writing">&larr; Back to all writing</a>
+    <a href="https://blog.dmv.is-a.dev" target="_blank" rel="noopener">Open in EmDash Publication &rarr;</a>
+  </nav>
+</main>
+
+</body>
+</html>
