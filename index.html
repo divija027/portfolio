@@ -486,68 +486,7 @@ summary.plate::marker{content:''}
 .plates-toggle:hover{color:var(--ink);background:rgba(255,252,244,.5)}
 .plates-toggle svg{width:12px;height:12px;transition:transform .35s ease}
 .plates-toggle.open svg{transform:rotate(180deg)}
-/* ---------- emdash publication card ---------- */
-.emdash-card{
-  border:1px solid var(--hairline);
-  background:rgba(255,252,244,.42);
-  padding:clamp(20px,2.4vw,28px);
-  margin-bottom:20px;
-  position:relative;
-  transition:border-color .22s ease, background-color .22s ease;
-}
-.emdash-card:hover{
-  border-color:rgba(43,39,33,.28);
-  background:rgba(255,252,244,.72);
-}
-.emdash-card-header{
-  display:flex;align-items:center;justify-content:space-between;
-  gap:12px;margin-bottom:12px;flex-wrap:wrap;
-}
-.emdash-badge{
-  font-family:var(--font);font-size:11.5px;letter-spacing:var(--track-caps);
-  text-transform:uppercase;color:var(--earth);font-weight:600;
-  display:inline-flex;align-items:center;gap:7px;
-}
-.emdash-badge:before{
-  content:"";width:6px;height:6px;border-radius:50%;background:var(--earth);
-  display:inline-block;
-}
-.emdash-meta{
-  font-size:12px;color:var(--ink-faint);letter-spacing:.04em;font-weight:300;
-}
-.emdash-title{
-  font-family:var(--display);font-size:clamp(22px,2.2vw,28px);
-  font-weight:400;margin:0 0 10px;line-height:1.2;color:var(--ink);
-}
-.emdash-desc{
-  font-size:clamp(14.5px,1.35vw,16px);line-height:1.7;font-weight:300;
-  color:var(--ink-soft);margin:0 0 20px;max-width:68ch;
-}
-.emdash-actions{
-  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
-}
-.emdash-btn{
-  font-size:12px;letter-spacing:var(--track-caps);text-transform:uppercase;
-  padding:8px 16px;border:1px solid var(--hairline);transition:all .2s ease;
-  display:inline-flex;align-items:center;gap:6px;color:var(--ink);text-decoration:none;
-}
-.emdash-btn.primary{
-  background:var(--ink);color:var(--paper);border-color:var(--ink);
-}
-.emdash-btn.primary:hover{
-  background:var(--earth);border-color:var(--earth);color:var(--paper);
-}
-.emdash-btn.secondary{
-  background:transparent;color:var(--ink-soft);
-}
-.emdash-btn.secondary:hover{
-  color:var(--ink);border-color:var(--ink-soft);background:rgba(255,252,244,.6);
-}
 @media (max-width:640px){
-  .emdash-card{padding:18px 14px}
-  .emdash-card-header{flex-direction:column;align-items:flex-start;gap:6px}
-  .emdash-actions{flex-direction:column;align-items:stretch}
-  .emdash-btn{justify-content:center}
   .plate{grid-template-columns:2.6em minmax(0,1fr);row-gap:8px}
   .plate .p{grid-column:2;text-align:left}
   .plate .m{display:block;grid-column:2;font-size:14px;line-height:1.6;
@@ -566,7 +505,6 @@ summary.plate::marker{content:''}
     <nav>
       <a href="#work">Work</a>
       <a href="#writing">Writing</a>
-      <a href="https://blog.dmv.is-a.dev" target="_blank" rel="noopener">Blog ↗</a>
       <a href="#about">About</a>
       <a href="#plates">Rupin</a>
       <div class="top-socials">
@@ -663,19 +601,7 @@ summary.plate::marker{content:''}
   <div class="rule short" aria-hidden="true"></div>
 
   <section id="writing" class="plates">
-    <p class="section-label">Writing &mdash; Cloudflare EmDash</p>
-    <div class="emdash-card">
-      <div class="emdash-card-header">
-        <span class="emdash-badge">Cloudflare EmDash</span>
-        <span class="emdash-meta">Astro &middot; Cloudflare Workers &middot; D1 &middot; R2</span>
-      </div>
-      <h3 class="emdash-title">The Engineering Journal</h3>
-      <p class="emdash-desc">Long-form writing on append-only ledgers, idempotent webhooks, distributed concurrency, and the unglamorous parts of system correctness.</p>
-      <div class="emdash-actions">
-        <a href="https://blog.dmv.is-a.dev" target="_blank" rel="noopener" class="emdash-btn primary">Read Publication <span>&rarr;</span></a>
-        <a href="https://blog.dmv.is-a.dev/_emdash/admin" target="_blank" rel="noopener" class="emdash-btn secondary">Admin Studio <span>&rarr;</span></a>
-      </div>
-    </div>
+    <p class="section-label">Writing</p>
     <ol class="plate-list" id="writingList">
       <li>
         <a class="plate" href="writing/how-we-run-a-bootstrapped-ai-startup-on-almost-zero-operating-costs.html">
