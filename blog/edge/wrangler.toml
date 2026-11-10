@@ -1,0 +1,8 @@
+name = "dmv-blog-edge"
+pages_build_output_dir = "."
+compatibility_date = "2026-02-24"
+compatibility_flags = ["nodejs_compat"]
+
+[[services]]
+binding = "BLOG"
+service = "dmv-blog"

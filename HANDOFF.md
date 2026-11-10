@@ -64,3 +64,27 @@ dig +short dmv.is-a.dev CNAME && curl -sSI https://dmv.is-a.dev | head -1
 ## 6. Later
 Swap the Reddit copies for the phone originals (AirDrop from the iPhone 13 Pro
 Max) — same filenames, better quality, EXIF dates intact.
+
+## 7. Blog — deployed, two manual steps left
+
+The EmDash blog is deployed and reachable:
+
+- Worker (D1 + R2 + KV + cron): <https://dmv-blog.gowdadivija.workers.dev>
+- Edge proxy: <https://dmv-blog-edge.pages.dev>
+
+`blog.dmv.is-a.dev` is attached to the `dmv-blog-edge` Pages project as a
+custom domain and is waiting for its CNAME record. The record is prepared in
+`deploy/blog.dmv.json`; submit it to `is-a-dev/register` as
+`domains/blog.dmv.json`. **Do this yourself** — is-a.dev rejects AI-generated
+pull requests and requires the site owner to submit the change.
+
+Once DNS is live, finish the EmDash setup at
+<https://blog.dmv.is-a.dev/_emdash/admin/setup> (passkey). Completing setup
+applies the bundled seed (2 collections, 9 posts, 1 page). Until then the blog
+renders an empty state.
+
+The portfolio nav no longer links to the blog (commit `57baadd`). Re-add the
+link only after the custom domain resolves; `blog.dmv.is-a.dev` is the URL to
+use.
+
+Deploy notes for the edge proxy are in `blog/edge/README.md`.
