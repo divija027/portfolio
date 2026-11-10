@@ -162,17 +162,7 @@ figcaption{
 }
 .callout p:last-child{margin-bottom:0}
 
-/* ---------------- author footer ---------------- */
-.author-card{
-  border:1px solid var(--hairline);background:rgba(255,252,244,.4);
-  padding:clamp(20px,3vw,28px);margin-top:54px;display:flex;gap:20px;align-items:center;
-}
-.author-info h4{
-  font-family:var(--display);font-size:22px;margin:0 0 6px;font-weight:400;color:var(--ink);
-}
-.author-info p{
-  font-size:14px;line-height:1.6;color:var(--ink-soft);margin:0;font-weight:300;
-}
+/* ---------------- article nav ---------------- */
 .article-nav{
   display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:36px;
   font-size:13px;letter-spacing:var(--track-caps);text-transform:uppercase;
@@ -184,7 +174,6 @@ figcaption{
   .top{padding-inline:14px;padding-block:12px 18px}
   .top .brand{font-size:20px}
   .top nav{font-size:13px;gap:12px}
-  .author-card{flex-direction:column;align-items:flex-start}
 }
 </style>
 </head>
@@ -209,8 +198,6 @@ figcaption{
     <h1>How We Run a Bootstrapped AI Startup on Almost Zero Operating Costs</h1>
     <div class="byline">
       <span>By Divija MV</span>
-      <span>&middot;</span>
-      <span>Former Co-Founder &amp; CTO, BrainReef</span>
     </div>
   </header>
 
@@ -410,13 +397,6 @@ figcaption{
   </article>
 
   <div class="rule"></div>
-
-  <footer class="author-card">
-    <div class="author-info">
-      <h4>Divija MV</h4>
-      <p>Backend-leaning TypeScript engineer in Bengaluru. Former Co-Founder &amp; CTO at BrainReef. Exploring inference engineering, append-only ledgers, and systems correctness.</p>
-    </div>
-  </footer>
 
   <nav class="article-nav">
     <a href="../#writing">&larr; Back to all writing</a>

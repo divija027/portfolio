@@ -36,7 +36,7 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;scroll-padding-top:calc(var(--header-h,147px) + 24px)}
 body{
   font-family:var(--font);font-weight:400;background:var(--paper);color:var(--ink);
   -webkit-font-smoothing:antialiased;overflow-x:hidden;
@@ -535,7 +535,7 @@ summary.plate::marker{content:''}
   <section id="about" class="about">
     <div>
       <p class="section-label">About</p>
-      <p class="bio">I am a backend-leaning TypeScript engineer in Bengaluru — Co-Founder and CTO of <a class="bio-link" href="https://brainreef.in" rel="noopener" target="_blank">BrainReef</a>, founding engineer at Fuleex. I have taken two products from nothing to paying users and then had to keep them correct: an append-only billing ledger where debit and refund are exactly-once by unique constraint, the payment webhook that funds it, and a multi-tenant seam that keeps one college&rsquo;s data out of another&rsquo;s.</p>
+      <p class="bio">I am a backend-leaning TypeScript engineer in Bengaluru, co-founder and CTO of <a class="bio-link" href="https://brainreef.in" rel="noopener" target="_blank">BrainReef</a> until October 2026, founding engineer at Fuleex. I have taken two products from nothing to paying users and then had to keep them correct: an append-only billing ledger where debit and refund are exactly-once by unique constraint, the payment webhook that funds it, and a multi-tenant seam that keeps one college&rsquo;s data out of another&rsquo;s.</p>
       <p class="bio">The work I am best at is the unglamorous kind. The cron that double-sent to real customers when a second instance picked up the same row. The three-query read-modify-write that raced. The in-memory rate-limit counter that stopped meaning anything the day we ran two processes.</p>
     </div>
     <img class="bloom" src="assets/bloom.png" alt="" aria-hidden="true" loading="lazy" decoding="async">
@@ -549,7 +549,7 @@ summary.plate::marker{content:''}
     <div class="row-list">
 
       <details class="row">
-        <summary class="plate"><span class="n">01</span><span class="t">BrainReef</span><span class="p">Co-Founder &amp; CTO · 2025&ndash;</span></summary>
+        <summary class="plate"><span class="n">01</span><span class="t">BrainReef</span><span class="p">Co-Founder &amp; CTO · 2025&ndash;Oct 2026</span></summary>
         <div class="row-body">
           <p class="row-lede">TypeScript monorepo, four production surfaces, 10,000+ users.</p>
           <ul>
@@ -689,6 +689,12 @@ summary.plate::marker{content:''}
    ===================================================================== */
 const Q=new URLSearchParams(location.search);
 const DIR='assets/spreads/';
+/* the top bar is fixed, so anchor jumps need to clear its measured height */
+const topBar=document.querySelector('.top');
+function syncHeader(){document.documentElement.style.setProperty('--header-h',topBar.offsetHeight+'px')}
+syncHeader();
+addEventListener('resize',syncHeader);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(syncHeader);
 /*PLATES:START*/
 const PAGES=[
   {file:"01.jpg", title:"The Valley Opens", place:"Rupin Valley", note:"The river found its line through the valley long before anyone thought to walk beside it."},
@@ -939,6 +945,7 @@ function hideHint(){hint.classList.add('gone')}
 
 stage.addEventListener('pointerdown',e=>{
   if(e.button!==0)return;
+  if(e.target.closest('.sb-arrow'))return;  /* let the arrow's own click handler run */
   e.preventDefault();                     /* no text selection, no image drag */
   const onBook=e.target.closest('.sb-zone');
   stage.setPointerCapture(e.pointerId);
