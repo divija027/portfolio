@@ -332,61 +332,43 @@ figcaption{
 
     <p>A few other programs worth looking at are Customer.io, Intercom's startup offering for Fin, and incident.io.</p>
 
-    <h2>So how many mock interviews could this setup handle at once?</h2>
-    <p>This was the number I wanted to work out, because “we had 1,000 RPM” did not tell us how many people can be in an interview at the same time.</p>
+    <h2>So how many mock interviews could we handle at once?</h2>
+    <p>Each interview makes roughly 15–25 LLM requests over 30 minutes, depending on how the candidate answers. With our 1,000 RPM Sarvam allocation, the theoretical LLM capacity comes to around 1,200–2,000 concurrent interviews. LLM requests aren't our immediate bottleneck.</p>
 
-    <p>Our mock interview flow made roughly 15–25 LLM requests over the full interview. The exact number depends on the candidate, because every answer goes back to the LLM and the next question is generated dynamically.</p>
-
-    <p>Assume a 30-minute interview and our account-specific 1,000 RPM LLM allocation. The average-rate calculation looks like this:</p>
-    <ul>
-      <li>At 25 LLM requests per interview: 1,000 &times; 30 &divide; 25 = <strong>1,200 concurrent interviews</strong>.</li>
-      <li>At 15 LLM requests per interview: 1,000 &times; 30 &divide; 15 = <strong>2,000 concurrent interviews</strong>.</li>
-    </ul>
-
-    <p>That is the theoretical LLM ceiling if requests are spread evenly across the interview. It is not a safe production target: candidates can answer at the same time, requests arrive in bursts, and RPM does not tell you how many requests are in flight. I would keep headroom rather than run the quota at 100%.</p>
-
-    <p>For a live voice interview, streaming STT is a more direct constraint. If each interview holds one streaming STT connection for the duration of the session, the published limits we can use as reference points are:</p>
+    <p>Streaming STT is more interesting. Based on the published limits:</p>
 
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
             <th>Provider</th>
-            <th>Streaming STT limit used in this estimate</th>
+            <th>Concurrent STT streams</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td><a href="https://developers.deepgram.com/reference/api-rate-limits" target="_blank" rel="noopener">Deepgram, India endpoint</a></td>
-            <td>150 concurrent requests</td>
+            <td><a href="https://developers.deepgram.com/reference/api-rate-limits" target="_blank" rel="noopener">Deepgram</a></td>
+            <td>150</td>
           </tr>
           <tr>
-            <td><a href="https://elevenlabs.io/docs/overview/models" target="_blank" rel="noopener">ElevenLabs, Scale realtime STT</a></td>
-            <td>45 concurrent requests</td>
+            <td><a href="https://elevenlabs.io/docs/overview/models" target="_blank" rel="noopener">ElevenLabs</a></td>
+            <td>45</td>
           </tr>
           <tr>
-            <td><a href="https://docs.sarvam.ai/api/getting-started/pricing" target="_blank" rel="noopener">Sarvam, public Growth WebSocket STT limit</a></td>
-            <td>100 concurrent connections</td>
+            <td><a href="https://docs.sarvam.ai/api/getting-started/pricing" target="_blank" rel="noopener">Sarvam</a></td>
+            <td>100</td>
           </tr>
           <tr>
-            <td><strong>Combined reference ceiling</strong></td>
-            <td><strong>295 concurrent streams</strong></td>
+            <td><strong>Total</strong></td>
+            <td><strong>295</strong></td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <p>If the application can distribute new STT streams across all three providers, that gives a theoretical ceiling of about 295 simultaneous interviews. Keeping 20% headroom puts the planning number at roughly <strong>235 concurrent interviews</strong>.</p>
+    <p>With traffic distributed across all three providers and 20% headroom, that's roughly 235 concurrent interviews on paper. If we're only routing STT through Deepgram, it's closer to 120.</p>
 
-    <p>If STT only uses Deepgram and the other providers are only TTS fallbacks, the number is different: Deepgram's 150 streaming STT requests become the ceiling, and I would plan around <strong>120 interviews</strong> with the same 20% headroom. The higher 235 estimate assumes STT failover or routing is also wired up across ElevenLabs and Sarvam.</p>
-
-    <p>TTS needs to be looked at separately. Deepgram lists up to 45 concurrent Aura/Aura-2 streaming TTS requests in India. ElevenLabs Scale lists 15 concurrent Multilingual v2 TTS requests or 30 Flash requests. Sarvam's public Growth limits list up to 1,000 concurrent TTS WebSocket connections. Those are published plan references, not proof of the exact limits on our startup-program accounts. These are generation slots, not one slot permanently reserved for each interview. A slot is occupied while audio is being generated; with WebSocket streaming, idle time does not consume the same capacity as an active generation.</p>
-
-    <p>So I would not add the TTS limits to the STT limits and call that our interview capacity. The actual TTS ceiling depends on how often each interviewer speaks, how long each audio generation takes, which model we use, and whether those requests arrive in a burst. ElevenLabs specifically says that on its TTS WebSocket only active generation time counts; an idle open socket does not use a slot in the same way. Other providers have their own endpoint-specific accounting. Those things would need to be measured under load. The provider response headers and our own metrics are more useful than a single number on a pricing page.</p>
-
-    <p>There is one important Sarvam caveat here. The 1,000 RPM number above is the LLM allocation we received. Sarvam publishes different limits for LLM, STT and TTS, and the public limits are not the same thing as a custom startup-program allocation. For the estimate above I used the published Growth STT WebSocket figure as a reference. The exact number for our Business-tier account would need to come from the account's rate-limit dashboard.</p>
-
-    <p>Based on those published limits, about 235 concurrent interviews would be the planning estimate if all three STT providers are available for routing. It is not a load-test result or a promise that we can sustain that number under every workload. That estimate would still need a proper load test with realistic answer lengths, audio durations, provider failover and request bursts.</p>
+    <p>TTS has its own concurrency limits, so this isn't a load-tested production number. Actual capacity depends on audio generation time, traffic spikes and how effectively our fallback routing works. Still, having multiple providers gives us quite a bit of room before we need to start paying for higher limits.</p>
 
     <h2>What I took away from this</h2>
     <p>You do not need to pay for every SaaS product from day one. A lot of companies have startup programs, student programs or free tiers, and applying directly can get you a useful amount of capacity even without a VC introduction.</p>
